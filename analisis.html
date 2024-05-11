@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Programa</title>
+    <link rel="icon" href="imgs/ZypherScript2.png" type="image/png">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="CSS/analisis.css" rel="stylesheet">
+    <!-- CodeMirror -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.1/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.1/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.1/mode/javascript/javascript.min.js"></script>
+    <script src="JS/AnalisisLexico.js"></script>
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">
+        <img src="imgs/ZypherScript2.png" alt="Logo" class="d-inline-block align-top">
+        ZypherScript
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="ov-btn-grow-skew-reverse" href="index.html">Inicio </a>
+            </li>
+            <li class="nav-item">
+                <a class="ov-btn-grow-skew-reverse" href="analisis.html">Análisis de Archivos</a>
+            </li>
+            <li class="nav-item">
+                <a class="ov-btn-grow-skew-reverse" href="progra.html">Realizar Programación</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container text-center">
+    <h1 class="mt-5">Cargar Archivo .atom</h1>
+    <input type="file" id="fileInput" class="btn btn-success">
+    <textarea id="codeEditor" class="code-editor"></textarea>
+     <!-- Botones -->
+     <div class="mt-3">
+        <button id="lexicalAnalysisButton" class="ov-btn-grow-skew-reverse">Análisis Léxico</button>
+        <button id="syntaxAnalysisButton" class="ov-btn-grow-skew-reverse">Análisis Sintáctico</button>
+        <button id="displayErrorTableButton" class="ov-btn-grow-skew-reverse">Mostrar Tabla de Errores</button>
+        <button id="displayTokenTableButton" class="ov-btn-grow-skew-reverse">Mostrar Tabla de Tokens</button>
+    </div>
+</div>
+
+<!--TABLA DE ERRORES-->
+<div id="errorTableModal" class="modal">
+    <div style="padding: 20px;">
+        <h2>Tabla de Errores</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Línea</th>
+                    <th>Tipo de Error</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody id="errorTableBody">
+                <!-- ERRORES SE INSERTARAN AQUI -->
+            </tbody>
+        </table>
+
+        <br><button onclick="document.getElementById('errorTableModal').style.display='none';">Cerrar</button></br>
+    </div>
+</div>
+
+<!-- TABLA DE TOKENS -->
+<div id="tokenTableModal" class="modal">
+    <div style="padding: 20px;">
+        <h2>Tabla de Tokens</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Línea</th>
+                    <th>Token</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody id="tokenTableBody">
+                <!-- TOKENS SE INSERTARAN AQUI -->
+            </tbody>
+        </table>
+        <button onclick="document.getElementById('tokenTableModal').style.display='none';">Cerrar</button>
+    </div>
+</div>
+
+
+
+<div class="hero"> 
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+</div>
+
+<!-- Bootstrap JS (Optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    document.getElementById('fileInput').addEventListener('change', function() {
+        var file = this.files[0];
+        if (file) {
+            var extension = file.name.split('.').pop();
+            if (extension.toLowerCase() !== 'atom') {
+                alert('Extensión no permitida, cargar archivos .atom');
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                editor.setValue(e.target.result);
+            };
+            reader.readAsText(file);
+        }
+    });
+
+    var editor = CodeMirror.fromTextArea(document.getElementById("codeEditor"), {
+        lineNumbers: true,
+        mode: "javascript",
+        theme: "material"
+    });
+
+</script>
+
+
+
+</body>
+</html>
