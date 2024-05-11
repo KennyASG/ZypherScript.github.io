@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
         let indexLineaActual = 0; // Indica el índice del inicio de la línea actual en el texto completo
         //AGREGAR TOKENS
         const regexPatterns = [
-            { tipo: 'comentarios', regex: /\/\/[^\n]*\n?/g }, // Asegúrate de que la regex maneja los comentarios correctamente
-            { tipo: 'nuevaLinea', regex: /(\r\n|\n|\r)/g }, // Asegúrate de manejar nuevaLinea antes que otros tokens
+            { tipo: 'comentarios', regex: /\/\/[^\n]*\n?/g }, 
+            { tipo: 'nuevaLinea', regex: /(\r\n|\n|\r)/g }, 
             { tipo: 'T_PalabrasClave', regex: /\b(BANDERIN|ANOTAR|ARBITRO|DELANTERO|GOL|TECNICO|PARTIDO|VASCULACION|DISPARO|VAR|TIRO|VOLANTE|CAMISOLA|PENALTI|TARJETA_ROJA|TARJETA_AMARILLA|EXTREMO|REMATE|ALCANSA_BOLA|SAQUE_DE_ESQUINA|DEFENSA|SAQUE_DE_PORTERIA|PORTERO|LOCAL|CONTRATACION|FISICO|BANCA|CONTRA_ATAQUE|CENTROCAMPISTA|BLOQUEO|MARCAR|GOL_OLIMPICO|JUGADA|PELOTA|ESQUINA|CABEZAZO|BICICLETA|REPETIR|FORMACION|CARRERA)\b/g },
             { tipo: 'T_OpeLogicos', regex: /\b(DOBLETE|SOLO|GOL_ANULADO|MANO_A_MANO)\b/g },
             { tipo: 'T_SentenciaControl', regex: /\b(PASE|RECHAZO|PASE_FILTRADO|OPCION|FALTA|DEFECTO)\b/g },
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { tipo: 'Operador_Logico', regex: /\b(DOBLETE|SOLO|GOL_ANULADO|MANO_A_MANO)\b/g },
             { tipo: 'Operador_Relacional', regex: /(?:>=|<=|==|!=|>|<)/g },
             { tipo: 'identificadores', regex: /\b[a-zA-Z][_a-zA-Z0-9]*\b/g },
-            { tipo: 'mensajeSalida', regex: /"[^"]*"/g },  // Añadir esta nueva línea para manejar los mensajes de salida entre comillas
+            { tipo: 'mensajeSalida', regex: /"[^"]*"/g },  
             { tipo: 'Llave_de_apertura', regex: /\{/g },
             { tipo: 'Llave_de_cierre', regex: /\}/g },
             { tipo: 'Parentesis_Apertura', regex: /\(/g },
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Hay texto que no coincide entre lastPos y match.index
                     const unknownText = texto.substring(lastPos, match.index).trim();
                     if (unknownText) {
-                        errores.push({ linea: lineaActual, tipo: "Símbolo o letra no reconocido", valor: unknownText });
+                        errores.push({ linea: lineaActual, tipo: "Símbolo no reconocido o identificador mal escrito", valor: unknownText });
                         // Resaltar la línea que contiene el error
                         editor.addLineClass(lineaActual - 1, 'background', 'linea-con-error');
                     }
