@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análisis Programa</title>
     <link rel="icon" href="imgs/ZypherScript2.png" type="image/png">
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="CSS/analisis.css" rel="stylesheet">
-    <!-- CodeMirror -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.1/codemirror.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.1/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.1/mode/javascript/javascript.min.js"></script>
     <script src="JS/AnalisisLexico.js"></script>
-
+    <script src="JS/AnalizadorSintactico.js"></script>
 </head>
 <body>
 
@@ -28,7 +26,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="ov-btn-grow-skew-reverse" href="index.html">Inicio </a>
+                <a class="ov-btn-grow-skew-reverse" href="index.html">Inicio</a>
             </li>
             <li class="nav-item">
                 <a class="ov-btn-grow-skew-reverse" href="analisis.html">Análisis de Archivos</a>
@@ -44,8 +42,7 @@
     <h1 class="mt-5">Cargar Archivo .atom</h1>
     <input type="file" id="fileInput" class="btn btn-success">
     <textarea id="codeEditor" class="code-editor"></textarea>
-     <!-- Botones -->
-     <div class="mt-3">
+    <div class="mt-3">
         <button id="lexicalAnalysisButton" class="ov-btn-grow-skew-reverse">Análisis Léxico</button>
         <button id="syntaxAnalysisButton" class="ov-btn-grow-skew-reverse">Análisis Sintáctico</button>
         <button id="displayErrorTableButton" class="ov-btn-grow-skew-reverse">Mostrar Tabla de Errores</button>
@@ -53,7 +50,6 @@
     </div>
 </div>
 
-<!--TABLA DE ERRORES-->
 <div id="errorTableModal" class="modal">
     <div style="padding: 20px;">
         <h2>Tabla de Errores</h2>
@@ -69,12 +65,10 @@
                 <!-- ERRORES SE INSERTARAN AQUI -->
             </tbody>
         </table>
-
         <br><button onclick="document.getElementById('errorTableModal').style.display='none';">Cerrar</button></br>
     </div>
 </div>
 
-<!-- TABLA DE TOKENS -->
 <div id="tokenTableModal" class="modal">
     <div style="padding: 20px;">
         <h2>Tabla de Tokens</h2>
@@ -95,22 +89,9 @@
     </div>
 </div>
 
-
-
-<div class="hero"> 
-    <div class="cube"></div>
-    <div class="cube"></div>
-    <div class="cube"></div>
-    <div class="cube"></div>
-    <div class="cube"></div>
-    <div class="cube"></div>
-</div>
-
-<!-- Bootstrap JS (Optional) -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
 <script>
     document.getElementById('fileInput').addEventListener('change', function() {
         var file = this.files[0];
@@ -134,9 +115,48 @@
         theme: "material"
     });
 
+    document.getElementById('lexicalAnalysisButton').addEventListener('click', function() {
+        for (let i = 0; i < editor.lineCount(); i++) {
+            editor.removeLineClass(i, 'background', 'linea-con-error');
+        }
+
+        const codigo = editor.getValue();
+        const resultado = analizarLexico(codigo);
+        console.log("Análisis léxico completado.");
+        alert("Análisis léxico completado.");
+        window.tokensGlobal = resultado.tokens; // Guardar tokens en una variable global
+        window.erroresLexicosGlobal = resultado.errores; // Guardar errores en una variable global
+    });
+
+    document.getElementById('syntaxAnalysisButton').addEventListener('click', function() {
+        const tokens = window.tokensGlobal || [];
+        if (tokens.length === 0) {
+            alert("No hay tokens para analizar. Por favor, realiza primero el análisis léxico.");
+            return;
+        }
+        const erroresSintacticos = analizarSintactico(tokens);
+        mostrarErroresSintacticos(erroresSintacticos);
+        document.getElementById('errorTableModal').style.display = 'block';  // Mostrar la tabla
+    });
+
+    document.getElementById('displayTokenTableButton').addEventListener('click', function() {
+        if (!window.tokensGlobal || window.tokensGlobal.length === 0) {
+            alert("No hay tokens para mostrar. Por favor, realiza primero el análisis léxico.");
+            return;
+        }
+        updateTokenTable(window.tokensGlobal);
+        document.getElementById('tokenTableModal').style.display = 'block';  // Mostrar la tabla
+    });
+
+    document.getElementById('displayErrorTableButton').addEventListener('click', function() {
+        if (!window.erroresLexicosGlobal || window.erroresLexicosGlobal.length === 0) {
+            alert("No hay errores para mostrar. Por favor, realiza primero el análisis léxico.");
+            return;
+        }
+        updateErrorTable(window.erroresLexicosGlobal);
+        document.getElementById('errorTableModal').style.display = 'block';  // Mostrar la tabla
+    });
 </script>
-
-
 
 </body>
 </html>
