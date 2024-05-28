@@ -29,14 +29,15 @@ function analizarSintactico(tokens) {
     function analizarMetodo() {
         esperar('T_ModifAcceso', 'PLANTILLA');
         esperar('T_PalabrasClave', 'BLOQUEO');
+        esperar('T_PalabrasClave'); // Para el segundo modificador de acceso
         esperar('identificadores');
         esperar('Parentesis_Apertura');
         if (tokens[i] && tokens[i].tipo === 'identificadores') {
             esperar('identificadores');
-            esperar('Parentesis_Cierre');
-        } else {
-            esperar('Parentesis_Cierre');
+            esperar('Corchete_Apertura');
+            esperar('Corchete_Cierre');
         }
+        esperar('Parentesis_Cierre');
         esperar('Llave_de_apertura');
         while (tokens[i] && tokens[i].tipo !== 'Llave_de_cierre') {
             analizarSentencia();
@@ -45,76 +46,108 @@ function analizarSintactico(tokens) {
     }
 
     function analizarSentencia() {
-        if (tokens[i].tipo === 'T_PalabrasClave') {
-            switch (tokens[i].valor) {
-                case 'VOLANTE':
-                    esperar('T_PalabrasClave', 'VOLANTE');
-                    esperar('identificadores');
-                    esperar('SignoIgual');
-                    esperar('numeros');
-                    esperar('PuntoyComa');
-                    break;
-                case 'DISPARO':
-                    esperar('T_PalabrasClave', 'DISPARO');
-                    esperar('mensajeSalida');
-                    esperar('PuntoyComa');
-                    break;
-                case 'VAR':
-                    esperar('T_PalabrasClave', 'VAR');
-                    esperar('identificadores');
-                    esperar('PuntoyComa');
-                    break;
-                case 'PASE_FILTRADO':
-                    esperar('T_PalabrasClave', 'PASE_FILTRADO');
-                    esperar('Parentesis_Apertura');
-                    esperar('identificadores');
-                    esperar('Parentesis_Cierre');
-                    esperar('Llave_de_apertura');
-                    while (tokens[i] && tokens[i].tipo !== 'Llave_de_cierre') {
-                        analizarCaso();
-                    }
-                    esperar('Llave_de_cierre');
-                    break;
-                default:
+        switch (tokens[i].tipo) {
+            case 'T_PalabrasClave':
+                switch (tokens[i].valor) {
+                    case 'VOLANTE':
+                        esperar('T_PalabrasClave', 'VOLANTE');
+                        esperar('identificadores');
+                        esperar('SignoIgual');
+                        esperar('numeros');
+                        while (tokens[i] && tokens[i].tipo === 'Coma') {
+                            esperar('Coma');
+                            esperar('identificadores');
+                            esperar('SignoIgual');
+                            esperar('numeros');
+                        }
+                        esperar('PuntoyComa');
+                        break;
+                    case 'DISPARO':
+                        esperar('T_PalabrasClave', 'DISPARO');
+                        esperar('Parentesis_Apertura');
+                        esperar('mensajeSalida');
+                        esperar('Parentesis_Cierre');
+                        esperar('PuntoyComa');
+                        break;
+                    case 'VAR':
+                        esperar('T_PalabrasClave', 'VAR');
+                        esperar('Parentesis_Apertura');
+                        esperar('identificadores');
+                        esperar('Parentesis_Cierre');
+                        esperar('PuntoyComa');
+                        break;
+                    case 'PASE_FILTRADO':
+                        esperar('T_PalabrasClave', 'PASE_FILTRADO');
+                        esperar('Parentesis_Apertura');
+                        esperar('identificadores');
+                        esperar('Parentesis_Cierre');
+                        esperar('Llave_de_apertura');
+                        while (tokens[i] && tokens[i].tipo !== 'Llave_de_cierre') {
+                            analizarCaso();
+                        }
+                        esperar('Llave_de_cierre');
+                        break;
+                    default:
+                        erroresSintacticos.push({
+                            tipo: 'Sintáctico',
+                            mensaje: `Sentencia desconocida ${tokens[i].valor}`,
+                            linea: tokens[i].linea
+                        });
+                        i++;
+                }
+                break;
+            case 'T_ModifAcceso':
+                if (tokens[i].valor === 'PLANTILLA') {
+                    analizarMetodo();
+                } else {
                     erroresSintacticos.push({
                         tipo: 'Sintáctico',
-                        mensaje: `Sentencia desconocida ${tokens[i].valor}`,
+                        mensaje: `Modificador de acceso desconocido ${tokens[i].valor}`,
                         linea: tokens[i].linea
                     });
                     i++;
-            }
-        } else {
-            erroresSintacticos.push({
-                tipo: 'Sintáctico',
-                mensaje: `Sentencia inválida`,
-                linea: tokens[i].linea
-            });
-            i++;
+                }
+                break;
+            default:
+                erroresSintacticos.push({
+                    tipo: 'Sintáctico',
+                    mensaje: `Sentencia inválida`,
+                    linea: tokens[i].linea
+                });
+                i++;
         }
     }
 
     function analizarCaso() {
-        if (tokens[i].tipo === 'T_SentenciaControl') {
-            esperar('T_SentenciaControl');
-            esperar('numeros');
-            esperar('DosPuntos');
-            while (tokens[i] && tokens[i].tipo !== 'T_SentenciaControl' && tokens[i].tipo !== 'Llave_de_cierre') {
-                analizarSentencia();
-            }
-        } else if (tokens[i].tipo === 'T_ModifAcceso' && tokens[i].valor === 'NO_CONVOCADO') {
-            esperar('T_ModifAcceso', 'NO_CONVOCADO');
-            esperar('DosPuntos');
-            while (tokens[i] && tokens[i].tipo !== 'T_SentenciaControl' && tokens[i].tipo !== 'Llave_de_cierre') {
-                analizarSentencia();
-            }
-        } else {
-            erroresSintacticos.push({
-                tipo: 'Sintáctico',
-                mensaje: `Caso de sentencia inválida`,
-                linea: tokens[i].linea
-            });
-            i++;
+        switch (tokens[i].tipo) {
+            case 'T_SentenciaControl':
+                esperar('T_SentenciaControl');
+                esperar('numeros');
+                esperar('DosPuntos');
+                while (tokens[i] && tokens[i].tipo !== 'T_SentenciaControl' && tokens[i].tipo !== 'Llave_de_cierre') {
+                    analizarSentencia();
+                }
+                break;
+            case 'T_ModifAcceso':
+                esperar('T_ModifAcceso', 'NO_CONVOCADO');
+                esperar('DosPuntos');
+                while (tokens[i] && tokens[i].tipo !== 'T_SentenciaControl' && tokens[i].tipo !== 'Llave_de_cierre') {
+                    analizarSentencia();
+                }
+                break;
+            default:
+                erroresSintacticos.push({
+                    tipo: 'Sintáctico',
+                    mensaje: `Caso de sentencia inválida`,
+                    linea: tokens[i].linea
+                });
+                i++;
         }
+    }
+
+    // Ignorar comentarios
+    while (tokens[i] && tokens[i].tipo === 'comentarios') {
+        i++;
     }
 
     if (tokens.length > 0) {
